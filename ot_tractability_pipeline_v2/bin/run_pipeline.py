@@ -10,7 +10,6 @@ Created on Mon Feb  3 10:38:51 2020
 
 import time
 import re
-#import zipfile
 import zlib
 import sys
 import argparse
@@ -19,7 +18,6 @@ import os
 import numpy as np
 import pandas as pd
 import mygene
-import pkg_resources
 from sqlalchemy import create_engine
 import json
 import requests
@@ -51,8 +49,7 @@ from ot_tractability_pipeline_v2.buckets_ab import *
 from ot_tractability_pipeline_v2.buckets_protac import *
 from ot_tractability_pipeline_v2.buckets_othercl import *
 
-
-DATA_PATH = pkg_resources.resource_filename('ot_tractability_pipeline_v2', 'data/')
+from settings import DATA_PATH
 
 POLLING_INTERVAL = 3
 API_URL = "https://rest.uniprot.org"

@@ -36,8 +36,7 @@ else:
 
 
 from ot_tractability_pipeline_v2.queries_protac import *
-
-DATA_PATH = pkg_resources.resource_filename('ot_tractability_pipeline_v2', 'data/')
+from settings import DATA_PATH
 
 class Protac_buckets(object):
     '''

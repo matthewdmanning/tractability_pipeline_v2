@@ -20,7 +20,6 @@ import sys
 # import mygene
 import numpy as np
 import pandas as pd
-import pkg_resources
 from sqlalchemy import create_engine, text
 
 PY3 = sys.version > '3'
@@ -32,7 +31,8 @@ else:
 
 from ot_tractability_pipeline_v2.queries_othercl import *
 
-DATA_PATH = pkg_resources.resource_filename('ot_tractability_pipeline_v2', 'data/')
+# Not used in this file.
+from settings import DATA_PATH
 
 class Othercl_buckets(object):
     '''

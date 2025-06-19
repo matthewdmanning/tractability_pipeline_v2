@@ -20,7 +20,6 @@ import os
 # import mygene
 import numpy as np
 import pandas as pd
-import pkg_resources
 import itertools
 from sqlalchemy import text
 
@@ -32,9 +31,7 @@ else:
 
 
 from ot_tractability_pipeline_v2.queries_sm import *
-
-DATA_PATH = pkg_resources.resource_filename('ot_tractability_pipeline_v2', 'data/')
-
+from settings import DATA_PATH
 
 class Small_molecule_buckets(object):
     '''
