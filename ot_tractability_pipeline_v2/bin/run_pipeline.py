@@ -10,7 +10,6 @@ Created on Mon Feb  3 10:38:51 2020
 
 import time
 import re
-#import zipfile
 import zlib
 import sys
 import argparse

@@ -20,6 +20,7 @@ import os
 # import mygene
 import numpy as np
 import pandas as pd
+import pkg_resources
 from sqlalchemy import text
 
 PY3 = sys.version > '3'
@@ -30,7 +31,8 @@ else:
 
 
 from ot_tractability_pipeline_v2.queries_ab import *
-from settings import DATA_PATH
+
+DATA_PATH = pkg_resources.resource_filename('ot_tractability_pipeline_v2', 'data/')
 
 class Antibody_buckets(object):
     '''

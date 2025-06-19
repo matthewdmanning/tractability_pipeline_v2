@@ -31,7 +31,8 @@ else:
 
 from ot_tractability_pipeline_v2.queries_othercl import *
 
-DATA_PATH = pkg_resources.resource_filename('ot_tractability_pipeline_v2', 'data/')
+# Not used in this file.
+from settings import DATA_PATH
 
 class Othercl_buckets(object):
     '''
