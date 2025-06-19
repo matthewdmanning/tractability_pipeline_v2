@@ -20,7 +20,6 @@ from sqlalchemy import create_engine, text # to re-establish connection
 # import mygene
 import numpy as np
 import pandas as pd
-import pkg_resources
 import ast
 # from sqlalchemy import create_engine
 
@@ -36,8 +35,7 @@ else:
 
 
 from ot_tractability_pipeline_v2.queries_protac import *
-
-DATA_PATH = pkg_resources.resource_filename('ot_tractability_pipeline_v2', 'data/')
+from settings import DATA_PATH
 
 class Protac_buckets(object):
     '''

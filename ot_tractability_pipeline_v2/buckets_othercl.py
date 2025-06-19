@@ -20,7 +20,6 @@ import sys
 # import mygene
 import numpy as np
 import pandas as pd
-import pkg_resources
 from sqlalchemy import create_engine, text
 
 PY3 = sys.version > '3'
