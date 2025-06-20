@@ -27,15 +27,16 @@ import requests
 import psutil
 import gc
 
-PY3 = sys.version > '3'
+PY3 = float(sys.version) >= 3.0
 if PY3:
-    import urllib.request as urllib2
+    import urllib.request as urllib_request
 else:
-    import urllib2
+    import urllib2 as urllib_request
 
+from ot_tractability_pipeline_v2 import queries_protac, settings
 
-from ot_tractability_pipeline_v2.queries_protac import *
-from settings import DATA_PATH
+CHEMBL_VERSION = settings.chembl_version_str()
+
 
 class Protac_buckets(object):
     '''
@@ -468,7 +469,7 @@ class Protac_buckets(object):
         #url = "https://www.ebi.ac.uk/europepmc/webservices/rest/search?resultType=core&query=ABSTRACT%3A%28%28ABSTRACT%3A%22proteolysis%20targeting%20chimera%22%20OR%20ABSTRACT%3A%22proteolysis%20targeting%20chimeric%22%29%20OR%20%28PROTAC%20AND%20%28degradation%20OR%20degrade%20OR%20ubiquitin%20OR%20proteolysis%29%29%29&resultType=lite&cursorMark=*&pageSize=1000&format=json"
     
         # urllib not working returning 404 page error -> replaced by requests
-        #url = urllib2.urlopen("https://www.ebi.ac.uk/europepmc/webservices/rest/search?resultType=core&query=ABSTRACT%3A%28%28ABSTRACT%3A%22proteolysis%20targeting%20chimera%22%20OR%20ABSTRACT%3A%22proteolysis%20targeting%20chimeric%22%29%20OR%20%28%28PROTAC%20OR%20SNIPER%29%20AND%20%28degradation%20OR%20degrade%20OR%20proteolysis%29%29%20OR%20%28degrader%20AND%20%28proteasome%20OR%20ubiquitin%29%29%29&resultType=lite&cursorMark=*&pageSize=1000&format=json")
+        #url = urllib_request.urlopen("https://www.ebi.ac.uk/europepmc/webservices/rest/search?resultType=core&query=ABSTRACT%3A%28%28ABSTRACT%3A%22proteolysis%20targeting%20chimera%22%20OR%20ABSTRACT%3A%22proteolysis%20targeting%20chimeric%22%29%20OR%20%28%28PROTAC%20OR%20SNIPER%29%20AND%20%28degradation%20OR%20degrade%20OR%20proteolysis%29%29%20OR%20%28degrader%20AND%20%28proteasome%20OR%20ubiquitin%29%29%29&resultType=lite&cursorMark=*&pageSize=1000&format=json")
         #data = url.read()
         #try: data = json.loads(data.decode())
         #except UnicodeDecodeError: data = json.loads(data)
@@ -507,7 +508,7 @@ class Protac_buckets(object):
         tags_list = []
         for chunk in chunks:
             url_s = 'https://www.ebi.ac.uk/europepmc/annotations_api/annotationsByArticleIds?{}&type=Gene_Proteins&format=JSON'.format(chunk)
-            url = urllib2.urlopen(url_s)
+            url = urllib_request.urlopen(url_s)
             data = url.read()
             try: data = json.loads(data.decode())
             except UnicodeDecodeError: data = json.loads(data)
@@ -1048,7 +1049,7 @@ class Protac_buckets(object):
         self.engine = create_engine(database_url)
 
         # small_mol_info = pd.read_sql_query(text(chembl_small_mol), self.engine)
-        self.all_chembl_targets = pd.read_sql_query(text(chembl_small_mol_active_targets), self.engine)
+        self.all_chembl_targets = pd.read_sql_query(text(queries_protac.chembl_small_mol_active_targets), self.engine)
         # self.all_chembl_targets = self.all_chembl_targets.merge(small_mol_info, on='parent_molregno')
 
         if self.store_fetched: 

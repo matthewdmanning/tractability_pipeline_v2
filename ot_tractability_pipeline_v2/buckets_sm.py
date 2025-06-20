@@ -23,15 +23,17 @@ import pandas as pd
 import itertools
 from sqlalchemy import text
 
-PY3 = sys.version > '3'
+PY3 = float(sys.version) >= 3.0
 if PY3:
-    import urllib.request as urllib2
+    import urllib.request as urllib_request
 else:
-    import urllib2
+    import urllib2 as urllib_request
 
 
-from ot_tractability_pipeline_v2.queries_sm import *
-from settings import DATA_PATH
+from ot_tractability_pipeline_v2 import queries_sm, settings
+
+CHEMBL_VERSION = settings.chembl_version_str()
+
 
 class Small_molecule_buckets(object):
     '''
@@ -125,10 +127,10 @@ class Small_molecule_buckets(object):
         '''
 
         # print("\t- Querying ChEMBL...")
-        self.all_chembl_targets = pd.read_sql_query(text(chembl_clinical_targets), self.engine)
+        self.all_chembl_targets = pd.read_sql_query(text(queries_sm.chembl_clinical_targets), self.engine)
         if self.store_fetched: 
             self.all_chembl_targets.to_csv("{}/sm_all_chembl_clinical_targets.csv".format(self.store_fetched))
-        small_mol_info = pd.read_sql_query(text(chembl_clinical_small_mol), self.engine)
+        small_mol_info = pd.read_sql_query(text(queries_sm.chembl_clinical_small_mol), self.engine)
         if self.store_fetched: 
             small_mol_info.to_csv("{}/sm_all_chembl_clinical_small_mol.csv".format(self.store_fetched))
         self.all_chembl_targets = self.all_chembl_targets.merge(small_mol_info, how='left', on='parent_molregno')
@@ -291,11 +293,11 @@ class Small_molecule_buckets(object):
     ##############################################################################################################
 
     # def make_request(self, url, data):
-    #     request = urllib2.Request(url)
+    #     request = urllib_request.Request(url)
 
     #     try:
-    #         url_file = urllib2.urlopen(request, data)
-    #     except urllib2.HTTPError as e:
+    #         url_file = urllib_request.urlopen(request, data)
+    #     except urllib_request.HTTPError as e:
     #         if e.code == 404:
     #             print("[NOTFOUND %d] %s" % (e.code, url))
     #         else:
@@ -308,11 +310,11 @@ class Small_molecule_buckets(object):
     # Method is used in several workflows
     @staticmethod
     def make_request(url, data):
-        request = urllib2.Request(url)
+        request = urllib_request.Request(url)
 
         try:
-            url_file = urllib2.urlopen(request, data)
-        except urllib2.HTTPError as e:
+            url_file = urllib_request.urlopen(request, data)
+        except urllib_request.HTTPError as e:
             if e.code == 404:
                 print("[NOTFOUND %d] %s" % (e.code, url))
             else:
@@ -339,8 +341,10 @@ class Small_molecule_buckets(object):
         if not isinstance(pdb, list): pdb = [pdb]
 
         # Python 2/3 compatability
-        try: pdb = [p.lower() for p in pdb if isinstance(p,(str,unicode))] #Python 2
-        except: pdb = [p.lower() for p in pdb if isinstance(p,str)] #Python 3
+        if not PY3:
+            pdb = [p.lower() for p in pdb if isinstance(p,(str,unicode))] #Python 2
+        else:
+            pdb = [p.lower() for p in pdb if isinstance(p,str)] #Python 3
 
         self.pdb_list += pdb
         for p in pdb:

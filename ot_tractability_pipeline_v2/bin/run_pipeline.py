@@ -31,13 +31,11 @@ import threading
 import psutil
 import gc
 
-PY3 = sys.version > '3'
+PY3 = float(sys.version) > 3.0
 if PY3:
-    import urllib.request as urllib2
-    import urllib.parse as urllib
+    pass
 else:
-    import urllib2
-    import urllib
+    import urllib2 as urllib_request
 
 from ot_tractability_pipeline_v2.queries_sm import *
 from ot_tractability_pipeline_v2.queries_ab import *

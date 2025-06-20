@@ -16,23 +16,20 @@ import re
 import sys
 import zipfile
 import os
-
 # import mygene
 import numpy as np
 import pandas as pd
-import pkg_resources
 from sqlalchemy import text
 
-PY3 = sys.version > '3'
+PY3 = float(sys.version) >= 3.0
 if PY3:
-    import urllib.request as urllib2
+    import urllib.request as urllib_request
 else:
-    import urllib2
+    import urllib2  as urllib_request
 
+from ot_tractability_pipeline_v2 import queries_ab, settings
+CHEMBL_VERSION = settings.chembl_version_str()
 
-from ot_tractability_pipeline_v2.queries_ab import *
-
-DATA_PATH = pkg_resources.resource_filename('ot_tractability_pipeline_v2', 'data/')
 
 class Antibody_buckets(object):
     '''
@@ -167,14 +164,14 @@ class Antibody_buckets(object):
 
         print("\t- Assessing clinical buckets 1-3...")
 
-        self.all_chembl_targets = pd.read_sql_query(text(chembl_clinical_ab_targets), self.engine)
+        self.all_chembl_targets = pd.read_sql_query(text(queries_ab.chembl_clinical_ab_targets), self.engine)
         self.all_chembl_targets.loc[self.all_chembl_targets['ref_type'] == 'Expert', ['ref_id', 'ref_url']] = 'NA'
 
         #
 
         self._process_protein_complexes()
 
-        ab_info = pd.read_sql_query(text(chembl_clinical_ab), self.engine)
+        ab_info = pd.read_sql_query(text(queries_ab.chembl_clinical_ab), self.engine)
         self.all_chembl_targets = self.all_chembl_targets.merge(ab_info, how='left', on='parent_molregno')
 
         if self.store_fetched: 
@@ -260,11 +257,11 @@ class Antibody_buckets(object):
     ##############################################################################################################
 
     # def make_request(self, url, data):
-    #     request = urllib2.Request(url)
+    #     request = urllib_request.Request(url)
 
     #     try:
-    #         url_file = urllib2.urlopen(request)
-    #     except urllib2.HTTPError as e:
+    #         url_file = urllib_request.urlopen(request)
+    #     except urllib_request.HTTPError as e:
     #         if e.code == 404:
     #             print("[NOTFOUND %d] %s" % (e.code, url))
     #         else:
@@ -277,10 +274,10 @@ class Antibody_buckets(object):
     # Method is used in several workflows
     @staticmethod
     def make_request(url, data):
-        request = urllib2.Request(url)
+        request = urllib_request.Request(url)
         try:
-            url_file = urllib2.urlopen(request, data)
-        except urllib2.HTTPError as e:
+            url_file = urllib_request.urlopen(request, data)
+        except urllib_request.HTTPError as e:
             if e.code == 404:
                 print("[NOTFOUND %d] %s" % (e.code, url))
             else:
@@ -292,7 +289,7 @@ class Antibody_buckets(object):
     def post_request_uniprot(url, data):
         #base = 'http://legacy.uniprot.org'
         #base = 'https://www.uniprot.org'
-        base = API_URL
+        base = settings.API_URL
         full_url = "%s/%s" % (base, url)
 
         if isinstance(data, (list, tuple)):
@@ -593,8 +590,8 @@ class Antibody_buckets(object):
         print("\t- Assessing Human Protein Atlas main location bucket 9...")
 
         # Download latest file
-        #zip_file = urllib2.urlopen('https://www.proteinatlas.org/download/subcellular_location.tsv.zip')
-        zip_file = urllib2.urlopen('https://www.proteinatlas.org/download/tsv/subcellular_location.tsv.zip')
+        #zip_file = urllib_request.urlopen('https://www.proteinatlas.org/download/subcellular_location.tsv.zip')
+        zip_file = urllib_request.urlopen('https://www.proteinatlas.org/download/tsv/subcellular_location.tsv.zip')
         with zipfile.ZipFile(io.BytesIO(zip_file.read()), 'r') as pa_file:
             with pa_file.open('subcellular_location.tsv') as subcell_loc:
                 df = pd.read_csv(subcell_loc, sep='\t', header=0)
